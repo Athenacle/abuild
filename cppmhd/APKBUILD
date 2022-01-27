@@ -1,0 +1,42 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=cppmhd
+pkgver=0.0.2
+pkgrel=0
+pkgdesc="C++ Http Framework based on libmicrohttpd"
+url="https://github.com/Athenacle/cppmhd"
+arch="all"
+license="MIT"
+depends="pcre2 libmicrohttpd openssl c-ares fmt"
+makedepends_build="pkgconfig"
+makedepends_host="cmake openssl-dev zlib-dev pcre2-dev libmicrohttpd-dev spdlog-dev c-ares-dev curl-dev gtest-dev fmt-dev"
+makedepends="$makedepends_host $makedepends_build"
+
+subpackages="$pkgname-dev $pkgname-dbg"
+source="$pkgname-$pkgver.tar.gz::https://github.com/Athenacle/cppmhd/archive/refs/tags/v${pkgver}.tar.gz"
+builddir="$srcdir"/cppmhd-$pkgver
+
+prepare() {
+	default_prepare
+}
+
+check(){
+    cmake --build ./build --target run-unittest
+}
+
+build() {
+	cmake -B build \
+             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+             -DCMAKE_INSTALL_PREFIX=/usr \
+             -DBUILD_SHARED=ON \
+             -DBUILD_STATIC=OFF \
+             -DBUILD_TESTS=ON
+    cmake --build build --verbose
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+
+sha512sums="d4f6ce3f430edca556dbcc3e46594a77270b85e8a757fe11f6f3dcf5aa58550256975ce1217cec399730642729088b6ef7f8356fe62b8dbb0314d99825ba179d  cppmhd-0.0.2.tar.gz
+"
